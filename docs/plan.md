@@ -5,8 +5,8 @@
 ## Day1 設計とGitHub
 - [x] 案件の項目を確認する（docs/design.md）
 - [x] 画面を紙に2枚描く（一覧・登録編集）。写真を `docs/screens/` に入れる
-- [ ] テーブル設計とAPI一覧を、自分の目で見直す
-- [ ] GitHubにリポジトリを作り、README・docs・CLAUDE.mdを入れる
+- [x] テーブル設計とAPI一覧を、自分の目で見直す
+- [x] GitHubにリポジトリを作り、README・docs・CLAUDE.mdを入れる
 
 ## Day2 土台・DB・一覧と登録API
 - [ ] Docker Desktopが動くか確認（10分まで）。動かなければH2で進める

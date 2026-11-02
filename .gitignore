@@ -10,6 +10,12 @@ dist/
 .idea/
 .vscode/
 *.iml
+# Eclipse
+.project
+.classpath
+.settings/
+bin/
+.metadata/
 # 環境変数・秘密情報
 .env
 *.local
