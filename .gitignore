@@ -1,0 +1,18 @@
+# Java / Gradle
+.gradle/
+build/
+out/
+*.class
+# Node
+node_modules/
+dist/
+# IDE
+.idea/
+.vscode/
+*.iml
+# 環境変数・秘密情報
+.env
+*.local
+# OS
+.DS_Store
+Thumbs.db
