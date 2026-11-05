@@ -11,7 +11,7 @@
 ## Day2 土台・DB・一覧と登録API
 - [x] Docker Desktopが動くか確認（10分まで）。動かなければH2で進める → WSLのエラーで起動せず。H2で進める
 - [x] Spring Bootプロジェクトを `backend/` に作る
-- [ ] DBに接続し、casesテーブルを作る（Entity）
+- [x] DBに接続し、casesテーブルを作る（Entity）
 - [ ] 一覧取得（GET）と登録（POST）のAPIを作り、動作確認する
 
 ## Day3 更新・削除・入力チェック・テスト
