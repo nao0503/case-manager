@@ -12,7 +12,7 @@
 - [x] Docker Desktopが動くか確認（10分まで）。動かなければH2で進める → WSLのエラーで起動せず。H2で進める
 - [x] Spring Bootプロジェクトを `backend/` に作る
 - [x] DBに接続し、casesテーブルを作る（Entity）
-- [ ] 一覧取得（GET）と登録（POST）のAPIを作り、動作確認する
+- [x] 一覧取得（GET）と登録（POST）のAPIを作り、動作確認する
 
 ## Day3 更新・削除・入力チェック・テスト
 - [ ] 1件取得・更新・削除のAPI
