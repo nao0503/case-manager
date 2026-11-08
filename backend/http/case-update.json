@@ -1,0 +1,8 @@
+{
+  "customerName": "サンプル商事",
+  "workType": "決算申告",
+  "dueDate": "2026-12-15",
+  "assignee": "担当A",
+  "status": "IN_PROGRESS",
+  "memo": "資料が届いたので入力を開始"
+}
