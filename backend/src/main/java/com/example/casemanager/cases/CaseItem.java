@@ -13,6 +13,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
 @Entity // このテーブルはDBのテーブルと対応
 @Table(name = "cases") // テーブル名はcases
@@ -22,22 +26,30 @@ public class CaseItem {
 	@GeneratedValue(strategy = GenerationType.IDENTITY) // DBが自動採番
 	private Long id;
 	
+	@NotBlank(message = "顧客名は必須です")
+	@Size(max = 100, message = "顧客名は100文字以内で入力してください")
 	@Column(nullable = false, length = 100) // 必須、100文字まで
 	private String customerName;
 	
+	@NotBlank(message = "作業の種類は必須です")
+	@Pattern(regexp = "決算申告|予定申告|年末調整|支払調書|償却資産|納期特例", message = "作業の種類が正しくありません")
 	@Column(nullable = false, length = 30) // 必須、30文字まで
 	private String workType;
 	
+	@NotNull(message = "期限は必須です")
 	@Column(nullable = false) // 必須
 	private LocalDate dueDate; // 日付だけ（時刻なし）
 	
+	@Size(max = 50, message = "担当者は50文字以内で入力してください")
 	@Column(length = 50) // 任意、50文字まで
 	private String assignee;
 	
+	@NotNull(message = "ステータスは必須です")
 	@Enumerated(EnumType.STRING) // enumを"IN_PROGRESS"のような文字で保存
 	@Column(nullable = false, length = 20) // 必須、20文字
 	private CaseStatus status;
 	
+	@Size(max = 500, message = "メモは500文字以内で入力してください")
 	@Column(length = 500) // 500文字
 	private String memo;
 	

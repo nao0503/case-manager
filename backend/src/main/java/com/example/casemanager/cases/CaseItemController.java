@@ -2,6 +2,8 @@ package com.example.casemanager.cases;
 
 import java.util.List;
 
+import jakarta.validation.Valid;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,61 +21,59 @@ import org.springframework.web.server.ResponseStatusException;
 @RequestMapping("/api/cases")
 public class CaseItemController {
 	private final CaseItemRepository repository;
-	
+
 	// DI:Springが用意したRepositoryを、ここで受け取る（自分でnewしない）
 	public CaseItemController(CaseItemRepository repository) {
 		this.repository = repository;
 	}
-	
+
 	// 一覧取得：GET /api/cases
 	@GetMapping
-	public List<CaseItem> list(){
+	public List<CaseItem> list() {
 		return repository.findAll();
 	}
-	
+
 	// 登録：POST /api/cases
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public CaseItem create(@RequestBody CaseItem caseItem) {
+	public CaseItem create(@Valid @RequestBody CaseItem caseItem) {
 		return repository.save(caseItem);
 	}
-	
+
 	// 1件取得：GET /api/cases/{id}
 	@GetMapping("/{id}")
 	public CaseItem get(@PathVariable Long id) {
 		return findCaseOrThrow(id);
 	}
-	
+
 	// 更新：PUT /api/cases/{id}
 	@PutMapping("/{id}")
-	public CaseItem update(@PathVariable Long id, @RequestBody CaseItem input) {
+	public CaseItem update(@PathVariable Long id,@Valid @RequestBody CaseItem input) {
 		CaseItem caseItem = findCaseOrThrow(id);
-		
+
 		caseItem.setCustomerName(input.getCustomerName());
 		caseItem.setWorkType(input.getWorkType());
 		caseItem.setDueDate(input.getDueDate());
 		caseItem.setAssignee(input.getAssignee());
 		caseItem.setStatus(input.getStatus());
 		caseItem.setMemo(input.getMemo());
-		
+
 		return repository.save(caseItem);
 	}
-	
+
 	// 削除：DELETE api/cases/{id}
 	@DeleteMapping("/{id}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void delete(@PathVariable Long id) {
 		CaseItem caseItem = findCaseOrThrow(id);
-		
+
 		repository.delete(caseItem);
 	}
-	
-	
+
 	// idの案件を書庫から出す。なければ404（get・update・deleteで共通）
 	private CaseItem findCaseOrThrow(Long id) {
 		return repository.findById(id)
-				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "この案件はすでに削除されています")); 
-		
-	
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "この案件はすでに削除されています"));
+
 	}
 }
