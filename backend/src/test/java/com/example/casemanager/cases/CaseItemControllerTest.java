@@ -120,7 +120,41 @@ class CaseItemControllerTest {
 		
 		mockMvc.perform(get("/api/cases/{id}", saved.getId()))
 		.andExpect(status().isNotFound());
-		
 	}
+	
+	@Test
+	void 顧客名が101文字なら400と文字数のメッセージが返る() throws Exception {
+		String json = """
+				{
+				  "customerName": "%s",
+				  "workType": "決算申告",
+				  "dueDate": "2026-11-30",
+				  "status": "NOT_STARTED"
+				}
+				""".formatted("あ".repeat(101));
 
+		mockMvc.perform(post("/api/cases")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(json))
+				.andExpect(status().isBadRequest())
+				.andExpect(jsonPath("$.errors.customerName").value("顧客名は100文字以内で入力してください"));
+	}
+	
+	@Test
+	void 顧客名100文字なら登録できて201が返る() throws Exception {
+		String json = """
+				{
+				  "customerName": "%s",
+				  "workType": "決算申告",
+				  "dueDate": "2026-11-30",
+				  "status": "NOT_STARTED"
+				}
+				""".formatted("あ".repeat(100));
+
+		mockMvc.perform(post("/api/cases")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(json))
+				.andExpect(status().isCreated())
+				.andExpect(jsonPath("$.customerName").value("あ".repeat(100)));
+	}
 }
