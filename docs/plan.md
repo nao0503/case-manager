@@ -20,8 +20,8 @@
 - [x] APIの動作テスト（curlまたはPostman、できれば簡単な自動テスト）
 
 ## Day4 Vueで一覧画面
-- [ ] `frontend/` にVue 3 + Viteを作る
-- [ ] 一覧APIを呼び、表に表示する
+- [x] `frontend/` にVue 3 + Viteを作る
+- [x] 一覧APIを呼び、表に表示する
 
 ## Day5 登録・編集・削除の画面
 - [ ] 一覧の右に出す登録・編集パネルをAPIにつなぐ

@@ -4,6 +4,7 @@ import java.util.List;
 
 import jakarta.validation.Valid;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,7 +31,7 @@ public class CaseItemController {
 	// 一覧取得：GET /api/cases
 	@GetMapping
 	public List<CaseItem> list() {
-		return repository.findAll();
+		return repository.findAll(Sort.by("dueDate", "id"));
 	}
 
 	// 登録：POST /api/cases
