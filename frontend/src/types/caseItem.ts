@@ -22,3 +22,16 @@ export const statusLabels: Record<CaseStatus, string> = {
   WAITING_REVIEW: '確認待ち',
   DONE: '完了',
 }
+
+// 作業の種類（この6つから選ぶ。APIの @Pattrn と同じ）
+export const workTypes = ['決算申告', '予定申告', '年末調整', '支払調書', '償却資産', '納期特例']
+
+// 登録・編集パネルで入力する項目（id や日時は、入力しないので含めない）
+export interface CaseForm {
+  customerName: string
+  workType: string
+  dueDate: string
+  assignee: string
+  status: CaseStatus
+  memo: string
+}
