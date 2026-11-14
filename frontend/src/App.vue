@@ -1,15 +1,55 @@
 <script setup lang="ts">
-import { customRef, onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
+import { dueGroupLabels, getDueGroup, toDateString, type DueGroup } from './utils/dueGroups'
 import { statusLabels, workTypes, type CaseForm, type CaseItem } from './types/caseItem'
 
 // 案件の一覧を入れる箱。中身が変わると、画面が自動で書き換わる
 const cases = ref<CaseItem[]>([])
 
+// 絞り込みの条件（空なら「絞り込まない」）
+const filterStatus = ref('')
+const filterAssignee = ref('')
+
 // 一覧をAPIから読み込む（最初の表示と、保存の後に使う）
 async function loadCases() {
-  const response = await fetch('/api/cases')
+  const params = new URLSearchParams()
+  if (filterStatus.value) params.set('status', filterStatus.value)
+  if (filterAssignee.value) params.set('assignee', filterAssignee.value)
+
+  const query = params.toString()
+  const response = await fetch(query ? `/api/cases?${query}` : '/api/cases')
   cases.value = await response.json()
 }
+
+// 区切りの表示順
+const groupOrder: DueGroup[] = ['overdue', 'thisWeek', 'thisMonth', 'later']
+
+// 案件を4つの区切りに分けたもの（cases が変わると、自動で計算し直される）
+const groupedCases = computed(() => {
+  const today = new Date()
+  return groupOrder.map((group) => ({
+    group: group,
+    label: dueGroupLabels[group],
+    items: visibleCases.value.filter((caseItem) => getDueGroup(caseItem.dueDate, today) === group),
+  }))
+})
+
+// 画面に見せる案件（期限が過ぎた完了案件は、「完了」で絞り込んだときだけ見せる）
+const visibleCases = computed(() => {
+  const todayString = toDateString(new Date())
+  return cases.value.filter((caseItem) => {
+    const isOverdueDone = caseItem.status === 'DONE' && caseItem.dueDate < todayString
+    return !isOverdueDone || filterStatus.value === 'DONE'
+  })
+})
+
+// 「解除」ボタン：絞り込みをやめて、全件を出す
+function clearFilter() {
+  filterStatus.value = ''
+  filterAssignee.value = ''
+  loadCases()
+}
+
 onMounted(loadCases)
 
 // パネルが開いているか
@@ -68,7 +108,7 @@ function closePanel() {
 async function save() {
   const body = {
     ...form.value,
-    duaDate: form.value.dueDate || null,
+    dueDate: form.value.dueDate || null,
     assignee: form.value.assignee || null,
     memo: form.value.memo || null,
   }
@@ -127,9 +167,28 @@ async function remove() {
       <h1>案件一覧</h1>
       <button type="button" @click="openNew">新規登録</button>
     </div>
+
+    <div class="filters">
+      <label>
+        ステータス
+        <select v-model="filterStatus" @change="loadCases">
+          <option value="">すべて</option>
+          <option v-for="(label, code) in statusLabels" :key="code" :value="code">
+            {{ label }}
+          </option>
+        </select>
+      </label>
+
+      <label>
+        担当者
+        <input v-model="filterAssignee" type="text" placeholder="例：担当A" @change="loadCases" />
+      </label>
+      <button type="button" @click="clearFilter">解除</button>
+    </div>
+
     <div class="layout">
       <section class="list">
-        <p>{{ cases.length }}件</p>
+        <p>{{ visibleCases.length }}件</p>
         <table>
           <thead>
             <tr>
@@ -140,11 +199,17 @@ async function remove() {
               <th>期限</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody v-for="g in groupedCases" :key="g.group">
+            <tr class="group-row">
+              <th colspan="5">{{ g.label }}（{{ g.items.length }}件）</th>
+            </tr>
             <tr
-              v-for="caseItem in cases"
+              v-for="caseItem in g.items"
               :key="caseItem.id"
-              :class="{ selected: caseItem.id === editingId && isPanelOpen }"
+              :class="{
+                selected: caseItem.id === editingId && isPanelOpen,
+                overdue: g.group === 'overdue' && caseItem.status !== 'DONE',
+              }"
               @click="openEdit(caseItem)"
             >
               <td>{{ caseItem.customerName }}</td>
@@ -170,12 +235,12 @@ async function remove() {
           作業の種類
           <select v-model="form.workType">
             <option value="" disabled>選択してください</option>
-            <option v-for="workType in workTypes" :key:="workType" :value="workType">
+            <option v-for="workType in workTypes" :key="workType" :value="workType">
               {{ workType }}
             </option>
           </select>
+          <span v-if="errors.workType" class="error">{{ errors.workType }}</span>
         </label>
-        <span v-if="errors.workType" class="error">{{ errors.workType }}</span>
 
         <label>
           期限
@@ -296,5 +361,25 @@ tbody tr.selected {
 .danger {
   margin-left: auto;
   color: #c00;
+}
+
+.filters {
+  display: flex;
+  gap: 16px;
+  align-items: flex-end;
+  margin-bottom: 12px;
+}
+
+tbody tr.group-row {
+  cursor: default;
+}
+
+tbody tr.group-row th {
+  background: #e8eef7;
+}
+
+tbody tr.overdue td {
+  color: #c00;
+  font-weight: bold;
 }
 </style>
