@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
@@ -28,9 +29,22 @@ public class CaseItemController {
 		this.repository = repository;
 	}
 
-	// 一覧取得：GET /api/cases
+	// 一覧を取る。status・assignee は任意（付いていれば絞り込む）。期限の早い順
 	@GetMapping
-	public List<CaseItem> list() {
+	public List<CaseItem> list(
+			@RequestParam(required = false) CaseStatus status,
+			@RequestParam(required = false) String assignee) {
+		Sort sort = Sort.by("dueDate", "id");
+		
+		if (status != null && assignee != null) {
+			return repository.findByStatusAndAssignee(status, assignee, sort);
+		}
+		if (status != null) {
+			return repository.findByStatus(status, sort);
+		}
+		if (assignee != null) {
+			return repository.findByAssignee(assignee, sort);
+		}
 		return repository.findAll(Sort.by("dueDate", "id"));
 	}
 
